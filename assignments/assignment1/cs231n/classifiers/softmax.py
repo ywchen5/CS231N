@@ -34,8 +34,26 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = X.shape[0]
+    num_class = W.shape[1]
 
+    for i in range(num_train):
+      scores = X[i].dot(W)
+      correct_class_score = scores[y[i]]
+      scores_exp = np.exp(scores)
+      correct_class_score_exp = np.exp(correct_class_score)
+      sum_exp = np.sum(scores_exp)
+
+      loss += -np.log(correct_class_score_exp / sum_exp)
+      for j in range(num_class):
+        dW[:, j] += scores_exp[j] / sum_exp * X[i]
+      dW[:, y[i]] -= X[i]
+
+    loss /= num_train
+    dW /= num_train
+    loss += reg * np.sum(W * W)
+    dW += 2 * reg * W
+        
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     return loss, dW
@@ -59,7 +77,29 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = X.shape[0]
+    num_class = W.shape[1]
+
+    scores = X.dot(W)
+    scores_exp = np.exp(scores)
+    correct_class_score = scores[np.arange(num_train), y]
+    correct_class_score_exp = scores_exp[np.arange(num_train), y]
+    sum_exp = np.sum(scores_exp, axis=1)
+
+    loss += -np.sum(np.log(correct_class_score_exp / sum_exp)) / num_train
+    probs = scores_exp / sum_exp.reshape(-1, 1)
+    probs[np.arange(num_train), y] -= 1
+    dW = X.T.dot(probs) / num_train    
+    
+    ### my wrong codes at first
+    # dW += X.T.dot(scores_exp / sum_exp.reshape(-1, 1))
+    # dW[:, y] -= X.T
+    # dW /= num_train
+    # dW[:, y] creates a new nopy, and the same line can be deleted multiple times
+    # this way is of no use
+
+    loss += reg * np.sum(W * W)
+    dW += 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

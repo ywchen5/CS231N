@@ -4,6 +4,11 @@
 \usepackage{geometry} % 添加 geometry 包以调整页面布局
 \usepackage{CJKutf8}
 \usepackage{setspace} % 添加 setspace 包以调整行间距
+\usepackage{hyperref}  % 使目录可以点击跳转
+\hypersetup{
+    pdfborder={0 0 0}
+}
+\setcounter{tocdepth}{2}
 \geometry{a4paper, margin=1in}
 
 \numberwithin{equation}{section}
@@ -18,13 +23,19 @@
     \vfill
     \includegraphics[width=0.4\textwidth]{images/school_badge.png}\\[1cm] % 确保路径正确
     {\large Zhejiang University}\\[1cm]
-    {\large \today}
+    {\large Starting from March 26, 2025}\\[0.5cm]
+    {\large Last updated: April 22, 2025}
 \end{titlepage}
 
 \onehalfspacing % 设置行间距为 1.5 倍
 
+\tableofcontents % 生成目录
+\newpage
+
 \section*{Lecture 1: History of CV and Introduction to CNNs}
+\addcontentsline{toc}{section}{Lecture 1: History of CV and Introduction to CNNs}
 \setcounter{section}{1}
+\setcounter{subsection}{0}
 \setcounter{equation}{0}
 \begin{itemize}
     \item \textbf{ImageNet:} Annual competition for image classification, started in 2010.
@@ -34,17 +45,22 @@
 \newpage
 
 \section*{Lecture 2: Image Classification Pipeline}
+\addcontentsline{toc}{section}{Lecture 2: Image Classification Pipeline}
 \setcounter{section}{2}
 \setcounter{equation}{0}
-\begin{enumerate}
-    \item \textbf{Goal:}\par
-    The task in Image Classification is to predict a single label (or a distribution over labels as shown here to indicate our confidence) for a given image. Images are 3-dimensional arrays of integers from 0 to 255, of size Width x Height x 3. The 3 represents the three color channels Red, Green, Blue.\par
-    \item \textbf{Attempts:}
-    \begin{itemize}
-        \item Find edges, then corners: does not work well.
-        \item Use large datasets with labels.
-    \end{itemize}
-    \item \textbf{Classifiers:}
+\subsection{Goal and Attempts}
+    \begin{enumerate}
+        \item \textbf{Goal:}\par
+        The task in Image Classification is to predict a single label (or a distribution over labels as shown here to indicate our confidence) for a given image. Images are 3-dimensional arrays of integers from 0 to 255, of size Width x Height x 3. The 3 represents the three color channels Red, Green, Blue.\par
+        \item \textbf{Attempts:}
+        \begin{itemize}
+            \item Find edges, then corners: does not work well.
+            \item Use large datasets with labels.
+        \end{itemize}
+    \end{enumerate}
+
+
+\subsection{Classifiers:}
     \begin{enumerate}
         \item \textbf{K-Nearest Neighbors (KNN):}
         \begin{itemize}
@@ -103,15 +119,17 @@
             \includegraphics[width=0.8\textwidth]{images/Lecture2/hard_cases_for_linear_classifier.png}
         \end{itemize}
     \end{enumerate}
-\end{enumerate}
 
 
 
 \newpage
 \section*{Lecture 3: Loss Functions and Optimization}
+\addcontentsline{toc}{section}{Lecture 3: Loss Functions and Optimization}
 \setcounter{section}{3}
+\setcounter{subsection}{0}
 \setcounter{equation}{0}
 
+\subsection{Loss Functions}
 \begin{enumerate}
     \item \textbf{Multiple SVM loss:}\par
     \begin{equation*}
@@ -175,13 +193,13 @@
     \end{equation*}
     where \(p\) is the "true" distribution and \(q\) is the predicted distribution.\par
     For Softmax, \(q = e^{s_j} / \sum_{k=1}^{C} e^{s_k}\), and the "true" distribution is a one-hot vector(p = [0,...,1,...,0] contains a single 1 at the \(y_i\)-th position).\par
+\end{enumerate}
 
-
-    \item \textbf{Optimization:}\par
+\subsection{Optimization:}
     Strategy: follow the slope
 
     So first we need to compute the gradient of the loss function with respect to the weights \(W\).\par
-    The method of finite differences(\((f(W+h) - f(W)) / h\)) is bad because of large amount of computation, dont't use it to train but to check the correctness of the implementation.\par
+    The method of finite differences(\((f(W+h) - f(W)) / h\)) is bad because of large amount of computation, dont't use it to train but to \textbf{check the correctness} of the implementation.\par
 
     \vspace{0.5cm}
     \textbf{step size/learning rate:} a hyperparameter that controls how much to change the model in response to the estimated gradient.\par
@@ -193,14 +211,16 @@
         \end{equation}
 
         The scores of each class are influenced by the rows of \(W\) corresponding to the classes.\par
-        Hence, the gradient of the loss function with respect to the weights \(W\) should focus on the rows.\par
+        Hence, the gradient of the loss function with respect to the weights \(W\) should focus on the rows.(assuming W is (C * D))\par
         
         \begin{itemize}
             \item \textbf{For Hinge Loss:}\par
             \begin{equation*}
                 L_i = \sum_{j \neq y_j} [\max(0, w^T_j x_i - w^T_{y_i} x_i + \Delta)]
             \end{equation*}
-
+            where \(w_j\) is the j-th row of W reshaped as a column.\par
+            \
+            
             Taking the gradient with respect \(w_{y_i}\)
             \begin{equation}
                 \nabla_{w_{y_i}} Li = - (\sum_{j \neq y_j}1(w^T_j x_j - w^T_{y_i} x_{y_i} + \Delta > 0)) x_i
@@ -210,6 +230,21 @@
             For the other rows where \(j \neq y_i \) (for every j) the gradient is:
             \begin{equation}
                 \nabla_{w_j} Li = 1(w^T_j x_j - w^T_{y_i} x_{y_i} + \Delta > 0)  x_i
+            \end{equation}
+
+            \item \textbf{For Softmax Loss:}\par
+            \begin{equation*}
+                L_i = -\log P(y_i | x_i) = -\log \frac{e^{s_{y_i}}}{\sum_{j=1}^{C} e^{s_j}} = -s_{y_i} + \log \sum_{j=1}^{C} e^{s_j}
+            \end{equation*}
+
+            Taking the gradient with respect \(w_{y_i}\)
+            \begin{equation}
+                \nabla_{w_{y_i}} Li = -x_i + \frac{e^{s_{y_i}}}{\sum_{j=1}^{C} e^{s_j}} x_i = -x_i + P(y_i | x_i) x_i
+            \end{equation}
+            
+            For the other rows where \(j \neq y_i \) (for every j) the gradient is:
+            \begin{equation}
+                \nabla_{w_j} Li = \frac{e^{s_j}}{\sum_{k=1}^{C} e^{s_k}} x_i = P(j | x_i) x_i
             \end{equation}
         
         \end{itemize}
@@ -224,7 +259,7 @@
         BGD: using the entire training set to evaluate the gradient.\par
     \end{enumerate}
 
-    \item {Image features:}\par
+\subsection{Image features:}
     Some times, only using the raw pixel values is not enough, we need to extract some features from the image.\par
     For example:
     \begin{itemize}
@@ -234,7 +269,115 @@
     \end{itemize}
 
 
+
+\newpage
+\section*{Lecture 4: Backpropagation and Neural Networks}
+\addcontentsline{toc}{section}{Lecture 4: Backpropagation and Neural Networks}
+\setcounter{section}{4}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Backpropagation}
+\begin{enumerate}
+    \item \textbf{Computation Graph:}\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture4/computation_graph.png}
+        \caption{Computation Graph Example: \(f(x) = \frac{1}{1 + e^{-(\omega_0 x_0 + \omega_1 x_1 + \omega_2)}}\)}
+        \label{fig:computation_graph}
+    \end{figure}
+    Along the edges of the graph, we do \textbf{forward} computations to get the scores of the classes, and get the output label.\par
+    And \textbf{backward} computations to get the gradients of the loss function with respect to the weights \(W\) and the input \(x\).\par
+
+
+    \item \textbf{Backpropagation}\par
+
+        \textbf{Sigmoid funtion:}
+        \begin{equation}
+            \sigma(x) = \frac{1}{1 + e^{-x}}
+        \end{equation}
+        It is a common activation function used in neural networks, especially in the output layer for binary classification tasks.\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.8\textwidth]{images/Lecture4/activation_functions.png}
+            \caption{Activation Functions}
+            \label{fig:activation_functions}
+        \end{figure}
+
+        \begin{itemize}
+            \item \textbf{Add gate:} gradient distributor\par
+            \item \textbf{Max gate:} gradient router\par
+            only the maximum value will pass through the gate, and the others will be zero.\par
+            \item \textbf{Mul gate:} gradient switcher\par
+        \end{itemize}
+
+        Additionally, if the element is a vector, the gradient will be Jacobian matrix with the same shape as the input.\par
+        For f(x, W) = Wx + b(x is a batch), the gradient is:
+        \begin{equation}
+            \nabla_x = dout * W^T ,\quad \nabla_W = x^T * dout ,\quad \nabla_b = \sum dout * 1
+        \end{equation}
+
 \end{enumerate}
+
+\newpage
+\subsection{Neural Networks:}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture4/two_layer_neural_network.png}
+        \caption{Neural Network Example: \(f(x) = W_2 \max(0, W_1 x)\)}
+        \label{fig:neural_network}
+    \end{figure}
+    Here, \(W_1\) contains the weights for the first layer, which can be thought of as computing the scores of the templates.\par
+    And \(W_2\) contains the weights for the second layer, which can be thought of as computing the final scores for the classes by taking a weighted sum of the scores from the first layer.\par
+
+    Below are figures showing the structure of a neural network.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture4/neural_like.png}
+        \caption{Neuron-like structure}
+        \label{fig:neural_like}
+    \end{figure}
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture4/neural_network_arch.png}
+        \caption{Neural Network Architecture}
+        \label{fig:neural_network_arch}
+    \end{figure}
+
+\newpage
+\section*{Lecture 5: Convolutional Neural Networks}
+\addcontentsline{toc}{section}{Lecture 5: Convolutional Neural Networks}
+\setcounter{section}{5}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Convolution Layer}
+Instead of stretching the input image into a long vector, now preserve the spatial structure.\par
+\begin{itemize}
+    \item \textbf{Filter:} Filters always extend the full \textbf{depth} of the input volume.\par
+    Convolve(slide) over all spatial locations.
+    Each filter is kind of looking for a specific feature in the image, so usually we have many filters in a convolutional layer.\par
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture5/Convolution_layer.png}
+        \caption{Convolution Operation}
+        \label{fig:convolution}
+    \end{figure}
+
+    \item \textbf{Convolution:}\par
+    In mathematical terms, the convolution operation is defined as:
+    \begin{equation}
+        f[x, y] * g[x, y] = \sum_{n_1=-\infty}^{\infty} \sum_{n_2=-\infty}^{\infty} f[n1, n2] * g[x-n1, y-n2]
+    \end{equation}
+    which means that the filter is flipped both horizontally and vertically before being applied to the image.\par
+
+    What we commonly do is a cross-correlation(互相关) operation, without flipping the filter, but we call it convolution.\par
+    
+
+
+\end{itemize}
 
 \end{CJK}
 \end{document}
