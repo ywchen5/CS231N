@@ -5,6 +5,7 @@
 \usepackage{CJKutf8}
 \usepackage{setspace} % 添加 setspace 包以调整行间距
 \usepackage{hyperref}  % 使目录可以点击跳转
+\usepackage{caption}
 \hypersetup{
     pdfborder={0 0 0}
 }
@@ -24,7 +25,7 @@
     \includegraphics[width=0.4\textwidth]{images/school_badge.png}\\[1cm] % 确保路径正确
     {\large Zhejiang University}\\[1cm]
     {\large Starting from March 26, 2025}\\[0.5cm]
-    {\large Last updated: April 22, 2025}
+    {\large Last updated: April 30, 2025}
 \end{titlepage}
 
 \onehalfspacing % 设置行间距为 1.5 倍
@@ -48,6 +49,7 @@
 \addcontentsline{toc}{section}{Lecture 2: Image Classification Pipeline}
 \setcounter{section}{2}
 \setcounter{equation}{0}
+
 \subsection{Goal and Attempts}
     \begin{enumerate}
         \item \textbf{Goal:}\par
@@ -283,7 +285,7 @@
     \begin{figure}[h]
         \centering
         \includegraphics[width=0.8\textwidth]{images/Lecture4/computation_graph.png}
-        \caption{Computation Graph Example: \(f(x) = \frac{1}{1 + e^{-(\omega_0 x_0 + \omega_1 x_1 + \omega_2)}}\)}
+        \caption*{Computation Graph Example: \(f(x) = \frac{1}{1 + e^{-(\omega_0 x_0 + \omega_1 x_1 + \omega_2)}}\)}
         \label{fig:computation_graph}
     \end{figure}
     Along the edges of the graph, we do \textbf{forward} computations to get the scores of the classes, and get the output label.\par
@@ -300,7 +302,7 @@
         \begin{figure}[h]
             \centering
             \includegraphics[width=0.8\textwidth]{images/Lecture4/activation_functions.png}
-            \caption{Activation Functions}
+            \caption*{Activation Functions}
             \label{fig:activation_functions}
         \end{figure}
 
@@ -319,12 +321,11 @@
 
 \end{enumerate}
 
-\newpage
 \subsection{Neural Networks:}
     \begin{figure}[h]
         \centering
         \includegraphics[width=0.8\textwidth]{images/Lecture4/two_layer_neural_network.png}
-        \caption{Neural Network Example: \(f(x) = W_2 \max(0, W_1 x)\)}
+        \caption*{Neural Network Example: \(f(x) = W_2 \max(0, W_1 x)\)}
         \label{fig:neural_network}
     \end{figure}
     Here, \(W_1\) contains the weights for the first layer, which can be thought of as computing the scores of the templates.\par
@@ -334,17 +335,18 @@
     \begin{figure}[h]
         \centering
         \includegraphics[width=0.6\textwidth]{images/Lecture4/neural_like.png}
-        \caption{Neuron-like structure}
+        \caption*{Neuron-like structure}
         \label{fig:neural_like}
     \end{figure}
 
     \begin{figure}[h]
         \centering
         \includegraphics[width=0.6\textwidth]{images/Lecture4/neural_network_arch.png}
-        \caption{Neural Network Architecture}
+        \caption*{Neural Network Architecture}
         \label{fig:neural_network_arch}
     \end{figure}
 
+    
 \newpage
 \section*{Lecture 5: Convolutional Neural Networks}
 \addcontentsline{toc}{section}{Lecture 5: Convolutional Neural Networks}
@@ -352,32 +354,432 @@
 \setcounter{subsection}{0}
 \setcounter{equation}{0}
 
-\subsection{Convolution Layer}
-Instead of stretching the input image into a long vector, now preserve the spatial structure.\par
-\begin{itemize}
-    \item \textbf{Filter:} Filters always extend the full \textbf{depth} of the input volume.\par
-    Convolve(slide) over all spatial locations.
-    Each filter is kind of looking for a specific feature in the image, so usually we have many filters in a convolutional layer.\par
+\subsection{The Layers of CNNs}
+\begin{enumerate}
+    \item \textbf{Convolution Layer}\par
+    Instead of stretching the input image into a long vector, now preserve the spatial structure.\par
+    \begin{itemize}
+        \item \textbf{Filter:} Filters always extend the full \textbf{depth} of the input volume.\par
+        Convolve(slide) over all spatial locations.
+        Each filter is kind of looking for a specific feature in the image, so usually we have many filters in a convolutional layer.\par
 
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.8\textwidth]{images/Lecture5/Convolution_layer.png}
+            \caption*{Convolution Operation}
+            \label{fig:convolution}
+        \end{figure}
+
+        \item \textbf{Convolution:}\par
+        In mathematical terms, the convolution operation is defined as:
+        \begin{equation}
+            f[x, y] * g[x, y] = \sum_{n_1=-\infty}^{\infty} \sum_{n_2=-\infty}^{\infty} f[n1, n2] * g[x-n1, y-n2]
+        \end{equation}
+        which means that the filter is flipped both horizontally and vertically before being applied to the image.\par
+
+        What we commonly do is a cross-correlation(互相关) operation, without flipping the filter, but we call it convolution.\par
+        
+    \end{itemize}
+
+    Output size = \((W - F + 2P) / S + 1\), where \(W\) is the input size, \(F\) is the filter size, \(P\) is the padding size, and \(S\) is the stride size.\par
+
+    Dilated convolutions: a convolution operation where the filter is applied to the input with gaps between the filter elements, allowing for a larger receptive field without increasing the number of parameters.\par
+
+    \item \textbf{Pooling Layer}\par
+    makes the representation smaller and more manageable.\par
+    Similar to convolution layer, strides are also used in pooling layers, but padding is not commonly used.\par 
+    \begin{itemize}
+        \item \textbf{Max Pooling}\par
+        \item \textbf{General Pooling:} average pooling or even L2-norm pooling are also used.\par
+    \end{itemize}
+
+    \item \textbf{Fully Connected Layer}\par
+    At the end of the network, we have a fully connected layer, which is just a normal neural network layer.\par
+
+    \item \textbf{Normalization Layer} \par
+    Many types of normalization layers have been proposed for use in ConvNet architectures, sometimes with the intentions of implementing inhibition schemes observed in the biological brain. 
+    However, these layers have since fallen out of favor because in practice their contribution has been shown to be minimal, if any. \par
+
+\end{enumerate}
+
+\textbf{In summary}, the steps are like this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture5/steps.png}
+    \caption*{Steps of Convolutional Neural Networks}
+    \label{fig:steps}
+\end{figure}
+
+
+\newpage
+\section*{Lecture 6: Training Convolutional Neural Networks(Part 1)}
+\addcontentsline{toc}{section}{Lecture 6: Training Convolutional Neural Networks(Part 1)}
+\setcounter{section}{6}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Activation Functions}
+\begin{enumerate}
+    \item \textbf{Sigmoid:}\par
+    \begin{equation}
+        \sigma(x) = \frac{1}{1 + e^{-x}}
+    \end{equation}
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.8\textwidth]{images/Lecture5/Convolution_layer.png}
-        \caption{Convolution Operation}
-        \label{fig:convolution}
+        \includegraphics[width=0.4\textwidth]{images/Lecture6/sigmoid.png}
+        \caption*{Sigmoid Activation Function}
+        \label{fig:sigmoid}
+    \end{figure}\par
+    Three problems with sigmoid:\par
+        \begin{enumerate}
+            \item Vanishing gradient problem: when the input is too large or too small, the gradient becomes very small, which slows down the training process.
+            \item Output is not zero-centered: the output of the activation function is always positive, which means the gradients(\(\partial L/\partial \omega = \partial L/\partial f \cdot \partial f/\partial \omega = \delta \cdot x\), in which f is the local gradient including the activation function) are always positive or negative according to \(\partial L/\partial \omega\), which can lead to inefficient updates:\par
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.4\textwidth]{images/Lecture6/sigmoid_problem2.png}
+                \caption*{Sigmoid Output is not Zero-Centered}
+                \label{fig:sigmoid_problem2}
+            \end{figure}
+            For example, if the optimal direction is the blue arrow, since positive or negative gradients only, the zig zag path is taken, which is inefficient.\par
+        
+            \item exp() is computationally expensive.
+        \end{enumerate}
+
+    \item \textbf{tanh:}\par
+    \begin{equation}
+        \tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}} = \frac{2}{1 + e^{-2x}} - 1
+    \end{equation}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/Lecture6/tanh.png}
+        \caption*{Tanh Activation Function}
+        \label{fig:tanh}
+    \end{figure}
+    It gets rid of the not zero-centered problem compared to sigmoid, but still has the vanishing gradient problem.\par
+
+    \item \textbf{ReLU(Rectified Linear Unit):}\par
+    \begin{equation}
+        \text{ReLU}(x) = \max(0, x)
+    \end{equation}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/Lecture6/relu.png}
+        \caption*{ReLU Activation Function}
+        \label{fig:relu}
+    \end{figure}
+    \begin{itemize}
+        \item Does not saturate(gradient equals 0) in the positive domain, so it does not suffer from the vanishing gradient problem.\par
+        \item Computationally efficient: only requires a simple thresholding at zero.\par
+        \item Converges much faster than sigmoid or tanh.\par
+        \item More biologically plausible: it is similar to the firing rate of a neuron, which is zero when the input is negative and increases linearly with the input when it is positive.\par
+    \end{itemize}
+    However, it is still not zero-centered.\par
+    Dead ReLU: when the input is negative, the output is always zero, which means the gradient is always zero, and the neuron is "dead": never update.\par
+    People like to initialize ReLU with a small positive bias(0), so that the neuron is not dead at the beginning.\par
+
+    \item \textbf{Leaky ReLU:}\par
+    Parametric ReLU:
+    \begin{equation}
+        \text{Parametric ReLU}(x) = \begin{cases}
+            x & \text{if } x > 0 \\
+            \alpha x & \text{if } x \leq 0
+        \end{cases}
+    \end{equation}
+    where \(\alpha\) is a small positive constant, usually set to 0.01.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/Lecture6/leaky_relu.png}
+        \caption*{Leaky ReLU Activation Function}
+        \label{fig:leaky_relu}
+    \end{figure}
+    
+    On the base of ReLU:
+    \begin{itemize}
+        \item it does not saturate.\par
+        \item it will not die.\par
+    \end{itemize}
+
+    \item \textbf{Exponential Linear Unit (ELU):}\par
+    \begin{equation}
+        \text{ELU}(x) = \begin{cases}
+            x & \text{if } x > 0 \\
+            \alpha (e^x - 1) & \text{if } x \leq 0
+        \end{cases}
+    \end{equation}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/Lecture6/elu.png}
+        \caption*{ELU Activation Function}
+        \label{fig:elu}
+    \end{figure}
+    \begin{itemize}
+        \item All benifits of ReLU.\par
+        \item Cloer to zero mean output.\par
+        \item Negative saturation region: add some robustness to noise.\par
+    \end{itemize}
+
+    \item \textbf{Maxout neuron:}\par
+    \begin{equation}
+        \text{Maxout}(x) = \max(\omega_1^T x + b_1, \omega_2^T x + b_2)
+    \end{equation}
+    Linear Regime. Does not saturate. Does not die.\par
+    However, double the number of parameters compared to ReLU.\par
+\end{enumerate}
+
+Some suggestions for choosing activation functions:
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture6/activation_function_choosing.png}
+    \caption*{Suggestions for Choosing Activation Functions}
+    \label{fig:activation_function_suggestions}
+\end{figure}
+
+\subsection{Data Preprocessing}\par
+\begin{enumerate}
+    \item \textbf{Zero centering}:
+    For [32, 32, 3] images:
+    \begin{itemize}
+        \item Subtract the mean image(AlexNet): [32, 32, 3].\par
+        \item Subtract the mean of each channel(VGGNet): mean of each 3 channels.\par
+    \end{itemize}
+    \item \textbf{Normalization:}For image data, we accutualy only do zero centering, since the pixel values are already in the range of 0 to 255, which is not too large.\par
+\end{enumerate}
+
+\subsection{Weight Initialization}\par
+\begin{enumerate}
+    \item \textbf{Zero initialization:} all neuron will be the same, and the gradients will be the same, so all neurons will learn the same features, which is not good.\par
+    \item \textbf{Small random initialization:} usually use a Gaussian distribution with mean 0 and small standard deviation, e.g., 0.01.\par
+    The problem is in deep networks, Wx becomes smaller and smaller, all the activation values will shrink to zero, then the gradients will also shrink to zero.\par
+    \item \textbf{Normal Gaussian Initialization:} problem: almost all the neurons completely saturate, so the gradients are almost zero.\par
+    \item \textbf{Xavier Initialization:} for tanh and sigmoid, we want the variance of the output to be the same as the variance of the input, so we set the variance of the weights to be \(1/n\), where \(n\) is the number of input neurons.\par
+\end{enumerate}
+
+\subsection{Batch Normalization}\par
+\begin{enumerate}
+    \item compute the \textbf{empirical} mean and variance independently for each dimension. not computed based on each batch.\par
+    \item normalize: 
+    \begin{equation}
+        \hat{x}^{(k)} = \frac{x^{(k)} - E[x^{x(k)}]}{\sqrt{Var[x^{(k)}]}}
+    \end{equation}
+    Usually inserted after Fully Connected or Convolutional layers, before the activation function.\par
+    \item scale and shift:
+    \begin{equation}
+        y^{(k)} = \gamma \hat{x}^{(k)} + \beta
+    \end{equation}
+    where \(\gamma\) and \(\beta\) are learnable parameters, which
+    \begin{itemize}
+        \item improves gradient flow through the network.\par
+        \item allows higher learning rates.\par
+        \item reduces the strong dependence on initialization.\par
+        \item acts as a regularizer, reducing the need for Dropout.\par
+    \end{itemize}
+\end{enumerate}
+
+\subsection{babysitting the learning process}\par
+\begin{enumerate}
+    \item Preprocess the data\par
+    \item Choose the architecture\par
+\end{enumerate}
+
+ 
+\subsection{Hyperparameter Optimization}\par
+learning rate: 1e-5 ~ 1e-3\par
+consider using log space, but uniform space.\par
+\begin{enumerate}
+    \item first stage: only a few epochs to get rough idea of what params work.\par
+    \item second stage: lobger running time, finer search.\par
+    when the cost get 3x larger than the original cost, break out.
+\end{enumerate}
+Consider random search instead of grid search, since it is more efficient and can cover a larger space.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture6/param_search.png}
+    \caption*{Hyperparameter Search}
+    \label{fig:param_search}
+\end{figure}\par
+
+\newpage
+\textbf{Some expeirence:}\par
+\begin{itemize}
+    \item bad initialization.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture6/bad_initialization.png}
+        \caption*{loss curve is flat then suddenly decreasing}
     \end{figure}
 
-    \item \textbf{Convolution:}\par
-    In mathematical terms, the convolution operation is defined as:
-    \begin{equation}
-        f[x, y] * g[x, y] = \sum_{n_1=-\infty}^{\infty} \sum_{n_2=-\infty}^{\infty} f[n1, n2] * g[x-n1, y-n2]
-    \end{equation}
-    which means that the filter is flipped both horizontally and vertically before being applied to the image.\par
-
-    What we commonly do is a cross-correlation(互相关) operation, without flipping the filter, but we call it convolution.\par
+    \item overfit or underfit.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture6/overfit_underfit.png}
+        \caption*{Overfitting and Underfitting}
+        \label{fig:overfit_underfit}
+    \end{figure}
     
-
-
+    \item ratio between the updates and values: around 0.001.\par
 \end{itemize}
+
+\section*{Lecture 7: Training Convolutional Neural Networks(Part 2)}
+\addcontentsline{toc}{section}{Lecture 7: Training Convolutional Neural Networks(Part 2)}
+\setcounter{section}{7}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Optimization Algorithms}
+\begin{enumerate}
+    \item Problems with SGD
+    \begin{enumerate}
+        \item Poor conditioning: Follow a zig-zag path to convergence, reducing efficiency.\par
+        Poor conditioning essentially happens when the loss function has very different curvature in different directions (the Hessian's largest and smallest eigenvalues differ greatly, i.e., high condition number)
+        
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture6/poor_conditioning.png}
+            \caption*{p1}
+        \end{figure}
+
+        \item saddle point/local minima
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture6/local_minima_and_saddle_points.png}
+            \caption*{Saddle Point}
+        \end{figure}
+        \item noisy gradients\par
+        every time only a small batch is used to compute the gradient other than the full training dataset, leading to high variance in the updates.
+
+    \end{enumerate}
+
+    \item SGD + Momentum
+    \begin{itemize}
+        \item SGD + Momentum\par
+        build up "velocity" as mean of gradients with weight decay:
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture6/SGD_add_Momentum.png}
+            \caption*{SGD with Momentum}
+            \label{fig:SGD_add_Momentum}
+        \end{figure}
+
+        \item Nesterov Momentum\par
+        Nesterov momentum is a variant of momentum that incorporates the gradient of the loss function at the "lookahead" position, which can lead to better convergence properties.
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture6/Nesterov_Momentum.png}
+            \caption*{Nesterov Momentum}
+            \label{fig:Nesterov_Momentum}
+        \end{figure}
+    \end{itemize}
+    \newpage
+
+    \item Adagrad and RMSprop
+    \begin{itemize}
+        \item Adagrad\par
+        Adagrad is an adaptive learning rate optimization algorithm that adjusts the learning rate for each parameter based on the historical gradients. It gives larger updates for infrequent parameters and smaller updates for frequent parameters.\par
+        However, the learning rate shrinks continuously, which can lead to premature convergence. Therefore, it is often not used in practice.
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture6/Adagrad.png}
+            \caption*{Adagrad}
+            \label{fig:Adagrad}
+        \end{figure}
+        
+
+        \item RMSprop\par
+        Based on Adagrad, RMSprop maintains a moving average of the squared gradients to normalize the gradients. This helps to mitigate the problem of vanishing or exploding gradients.
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.8\textwidth]{images/Lecture6/RMSprop.png}
+            \caption*{RMSprop}
+            \label{fig:RMSprop}
+        \end{figure}
+    \end{itemize}
+
+    \item Adam\par
+    Adam (Adaptive Moment Estimation) is an optimization algorithm that combines the benefits of both Adagrad and RMSprop. It maintains a moving average of both the gradients and the squared gradients, which helps to adaptively adjust the learning rates for each parameter.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture6/Adam_first.png}
+        \caption*{Adam}
+        \label{fig:Adam}
+    \end{figure}
+    \newpage
+
+    Since initializing the second moment to 0, the first step can be very large, which can lead to instability in the optimization process. To counteract this, Adam includes a bias correction term that adjusts the learning rates based on the moving averages of the gradients and squared gradients.\par
+    Hence bias is used:\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture6/Adam_with_bias.png}
+        \caption*{Adam with Bias Correction}
+        \label{fig:Adam_bias_correction}
+    \end{figure}
+\end{enumerate}
+
+\subsection{Second-Order Optimization}
+Second-order optimization methods use information about the curvature of the loss function to make more informed updates to the model parameters.\par 
+L-BFGS: need to compute the Hessian matrix, which can be expensive for large models.\par
+
+\subsection{Model Ensembles}
+To reduce training error, combines several models to improve overall performance. 
+
+\subsection{Regularization}
+\begin{enumerate}
+    \item Dropout:\par
+    In each forward pass, randomly set some neurons (activation) to zero with a probability \(p\), which is a hyperparameter.\par
+    \begin{itemize}
+        \item Add randomnessForce the model to learn more robust features that are useful in conjunction with other neurons, rather than relying on specific ones.\par
+        \item average out the randomness at test-time at test time
+    \end{itemize}
+
+    \item Batch Normalization\par
+    \item Data Augmentation:\par
+    Random mix of translation/rotation/stretching/shearing/lens distortions...\par
+
+    \item Fracional Max Pooling\par
+    \item Stochastic Depth:\par
+    Randomly drop entire layers during training, which helps to prevent overfitting and encourages the model to learn more robust features.\par
+\end{enumerate}
+
+\subsection{Transfer Learning}
+Transfer learning is a technique where a model trained on one task is fine-tuned on a different but related task.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture6/Transfer_Learning.png}
+    \caption*{Transfer Learning}
+    \label{fig:transfer_learning}
+\end{figure}
+\newpage
+
+
+\section*{Lecture 8}
+\addcontentsline{toc}{section}{Lecture 8: Advanced Topics in Deep Learning}
+\setcounter{section}{8}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Deep Learning Framework}
+\begin{enumerate}
+    \item Pytorch\par
+    Every time build a computational graph, and then compute the gradients using backpropagation(Dynamic Computational Graph).\par
+    Use a different data type(e.g. torch.cuda.FloatTensor) to adapt to GPU.\par
+    \begin{itemize}
+        \item Variable is a node in a computational graph. requires\_grad=True is used to track gradients.\par
+        \item x.data is a Tensor.
+        \item x.grad is a Variable of gradients.
+        \item x.grad.data is a Tensor of gradients.
+    \end{itemize}
+    Use nn to encapsulate layers and models.\par  
+    Visdom: something like TensorBoard.\par
+
+    \item TensorFlow\par
+    \begin{itemize}
+        \item Build computational graphs first(Static Computational Graph). TensorFlow Fold allows for dynamic computation graphs.
+        \item Automatic differentiation.
+    \end{itemize}
+    Keras: High-Level Wrapper\par
+    TensorBoard: Visualization tool for TensorFlow.\par
+\end{enumerate}
+\newpage
+
 
 \end{CJK}
 \end{document}
