@@ -750,8 +750,8 @@ Transfer learning is a technique where a model trained on one task is fine-tuned
 \newpage
 
 
-\section*{Lecture 8}
-\addcontentsline{toc}{section}{Lecture 8: Advanced Topics in Deep Learning}
+\section*{Lecture 8: Deep Learning Frameworks}
+\addcontentsline{toc}{section}{Lecture 8: Deep Learning Frameworks}
 \setcounter{section}{8}
 \setcounter{subsection}{0}
 \setcounter{equation}{0}
@@ -780,6 +780,91 @@ Transfer learning is a technique where a model trained on one task is fine-tuned
 \end{enumerate}
 \newpage
 
+
+\section*{Lecture 9: CNN Architectures}
+\addcontentsline{toc}{section}{Lecture 9: CNN Architectures}
+\setcounter{section}{9}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Case Study: CNN Architectures}
+\begin{enumerate}
+    \item LeNet\par
+    One of the earliest CNN architectures, just the simple ones above.\par
+    \item AlexNet\par
+    A deeper CNN architecture with more Layers and filters.\par
+
+    \item VGGNet\par
+    A CNN architecture that emphasizes depth, using very small (3x3) convolution filters.\par
+    Stack of three 3x3 convolutional layers has same receptive field as a single 7x7 convolutional layer, but with fewer parameters.\par
+
+
+    \item GoogleNet\par
+    A CNN architecture that introduces the Inception module, which allows for multi-scale feature extraction by concatenating filters of different sizes.\par
+    No full connection layers.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture9/naive_inception_module.png}
+        \caption*{Naive Inception Module}
+        \label{fig:naive_inception}  
+    \end{figure}
+
+    \newpage
+    Since the depth is increased, the dimension reduction is needed using 1x1 "bottleneck" layers:\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture9/dimension_reduction.png}
+        \caption*{Inception Module}
+        \label{fig:inception_module}
+    \end{figure}
+    
+
+    \item ResNet\par
+    Too deeper CNN architecture seems not to learn well, hence, the input itself is also transformed through a series of convolutions and identity mappings, allowing for better gradient flow and feature reuse.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture9/residual_block.png}
+        \caption*{Residual Block}
+        \label{fig:residual_block}
+    \end{figure}
+    where F(x) is the residual function and x is the input.\par
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture9/ResNet.png}
+        \caption*{ResNet Architecture}
+        \label{fig:resnet_architecture}
+    \end{figure}
+    "Bottleneck" layers are also considered.\par
+    \newpage
+
+\end{enumerate}
+
+\subsection{Other Architectures}
+\begin{enumerate}
+    \item Network in Network (NiN)\par
+    Using multilayer perceptron (MLP) layers (FC, i.e. 1x1 convolution)\par
+
+    \item Improving ResNets:\par
+    \begin{itemize}
+        \item Identity Mappings in Deep Residual Networks
+        \item Wide Residual Networks(F x k filters)
+        \item Aggregated Residual Transformations
+        \item Deep Networks with Stochastic Depth(drop out)
+    \end{itemize}
+
+    \item Beyond ResNets:\par
+    \begin{itemize}
+        \item FractalNet\par
+        A CNN architecture that uses a fractal-like pattern to increase depth and improve feature extraction.\par
+        \item Densely Connected Convolutional Networks (DenseNet)\par
+        A CNN architecture that connects each layer to every other layer in a feed-forward fashion, encouraging feature reuse and improving gradient flow.\par
+    \end{itemize}
+
+    \item SqueezeNet\par
+    A CNN architecture that aims to achieve a smaller model size while maintaining accuracy, using techniques like fire modules and squeeze layers.\par
+\end{enumerate}
+\newpage
 
 \end{CJK}
 \end{document}
