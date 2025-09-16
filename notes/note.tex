@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx} % 添加 graphicx 包
 \usepackage{amsmath} % 添加 amsmath 包以支持数学公式
+\usepackage{amssymb} % 添加 amssymb 包以支持 \mathbb{E}
 \usepackage{geometry} % 添加 geometry 包以调整页面布局
 \usepackage{CJKutf8}
 \usepackage{setspace} % 添加 setspace 包以调整行间距
@@ -24,8 +25,7 @@
     \vfill
     \includegraphics[width=0.4\textwidth]{images/school_badge.png}\\[1cm] % 确保路径正确
     {\large Zhejiang University}\\[1cm]
-    {\large Starting from March 26, 2025}\\[0.5cm]
-    {\large Last updated: April 30, 2025}
+    {\large Last updated: August 16, 2025}
 \end{titlepage}
 
 \onehalfspacing % 设置行间距为 1.5 倍
@@ -195,6 +195,12 @@
     \end{equation*}
     where \(p\) is the "true" distribution and \(q\) is the predicted distribution.\par
     For Softmax, \(q = e^{s_j} / \sum_{k=1}^{C} e^{s_k}\), and the "true" distribution is a one-hot vector(p = [0,...,1,...,0] contains a single 1 at the \(y_i\)-th position).\par
+
+    When the score is big, overflow may happen, so we need to subtract the maximum score from all scores before exponentiating:
+    \begin{verbatim}
+        shifted_logits = x - np.max(x, axis=1, keepdims=True)
+    \end{verbatim}
+     
 \end{enumerate}
 
 \subsection{Optimization:}
@@ -618,6 +624,8 @@ Consider random search instead of grid search, since it is more efficient and ca
     
     \item ratio between the updates and values: around 0.001.\par
 \end{itemize}
+\newpage
+
 
 \section*{Lecture 7: Training Convolutional Neural Networks(Part 2)}
 \addcontentsline{toc}{section}{Lecture 7: Training Convolutional Neural Networks(Part 2)}
@@ -634,14 +642,14 @@ Consider random search instead of grid search, since it is more efficient and ca
         
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{images/Lecture6/poor_conditioning.png}
+            \includegraphics[width=0.6\textwidth]{images/Lecture7/poor_conditioning.png}
             \caption*{p1}
         \end{figure}
 
         \item saddle point/local minima
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{images/Lecture6/local_minima_and_saddle_points.png}
+            \includegraphics[width=0.6\textwidth]{images/Lecture7/local_minima_and_saddle_points.png}
             \caption*{Saddle Point}
         \end{figure}
         \item noisy gradients\par
@@ -655,21 +663,21 @@ Consider random search instead of grid search, since it is more efficient and ca
         build up "velocity" as mean of gradients with weight decay:
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{images/Lecture6/SGD_add_Momentum.png}
+            \includegraphics[width=0.6\textwidth]{images/Lecture7/SGD_add_Momentum.png}
             \caption*{SGD with Momentum}
             \label{fig:SGD_add_Momentum}
         \end{figure}
+        \newpage
 
         \item Nesterov Momentum\par
         Nesterov momentum is a variant of momentum that incorporates the gradient of the loss function at the "lookahead" position, which can lead to better convergence properties.
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{images/Lecture6/Nesterov_Momentum.png}
+            \includegraphics[width=0.6\textwidth]{images/Lecture7/Nesterov_Momentum.png}
             \caption*{Nesterov Momentum}
             \label{fig:Nesterov_Momentum}
         \end{figure}
     \end{itemize}
-    \newpage
 
     \item Adagrad and RMSprop
     \begin{itemize}
@@ -678,7 +686,7 @@ Consider random search instead of grid search, since it is more efficient and ca
         However, the learning rate shrinks continuously, which can lead to premature convergence. Therefore, it is often not used in practice.
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{images/Lecture6/Adagrad.png}
+            \includegraphics[width=0.6\textwidth]{images/Lecture7/Adagrad.png}
             \caption*{Adagrad}
             \label{fig:Adagrad}
         \end{figure}
@@ -688,7 +696,7 @@ Consider random search instead of grid search, since it is more efficient and ca
         Based on Adagrad, RMSprop maintains a moving average of the squared gradients to normalize the gradients. This helps to mitigate the problem of vanishing or exploding gradients.
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.8\textwidth]{images/Lecture6/RMSprop.png}
+            \includegraphics[width=0.8\textwidth]{images/Lecture7/RMSprop.png}
             \caption*{RMSprop}
             \label{fig:RMSprop}
         \end{figure}
@@ -698,7 +706,7 @@ Consider random search instead of grid search, since it is more efficient and ca
     Adam (Adaptive Moment Estimation) is an optimization algorithm that combines the benefits of both Adagrad and RMSprop. It maintains a moving average of both the gradients and the squared gradients, which helps to adaptively adjust the learning rates for each parameter.\par
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.8\textwidth]{images/Lecture6/Adam_first.png}
+        \includegraphics[width=0.8\textwidth]{images/Lecture7/Adam_first.png}
         \caption*{Adam}
         \label{fig:Adam}
     \end{figure}
@@ -708,7 +716,7 @@ Consider random search instead of grid search, since it is more efficient and ca
     Hence bias is used:\par
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.8\textwidth]{images/Lecture6/Adam_with_bias.png}
+        \includegraphics[width=0.8\textwidth]{images/Lecture7/Adam_with_bias.png}
         \caption*{Adam with Bias Correction}
         \label{fig:Adam_bias_correction}
     \end{figure}
@@ -729,6 +737,12 @@ To reduce training error, combines several models to improve overall performance
         \item Add randomnessForce the model to learn more robust features that are useful in conjunction with other neurons, rather than relying on specific ones.\par
         \item average out the randomness at test-time at test time
     \end{itemize}
+    \textbf{Dropout mask:} A 0/1 matrix to decide whether to drop a neuron or not.\par
+    \begin{verbatim}
+        mask = (np.random.rand(*x.shape) >= p) / (1 - p)
+    \end{verbatim}
+    Here, divide by \( 1 - p \) to maintain the expectation of the output between training and testing phases.
+
 
     \item Batch Normalization\par
     \item Data Augmentation:\par
@@ -743,7 +757,7 @@ To reduce training error, combines several models to improve overall performance
 Transfer learning is a technique where a model trained on one task is fine-tuned on a different but related task.\par
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/Lecture6/Transfer_Learning.png}
+    \includegraphics[width=0.8\textwidth]{images/Lecture7/Transfer_Learning.png}
     \caption*{Transfer Learning}
     \label{fig:transfer_learning}
 \end{figure}
@@ -866,9 +880,726 @@ Transfer learning is a technique where a model trained on one task is fine-tuned
 \end{enumerate}
 \newpage
 
+
+\section*{Lecture 10: Recurrent Neural Networks}
+\addcontentsline{toc}{section}{Lecture 10: Recurrent Neural Networks}
+\setcounter{section}{10}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+From one-to-one(Vanilla Neural Network) to one-to-many, many-to-one, many-to-many.\par
+\subsection{Vanilla RNN}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/Vanilla_RNN.png}
+    \caption*{Vanilla RNN}
+    \label{fig:vanilla_rnn}
+\end{figure}
+The weight W is reused, hence in backpropagation, the sum of the gradients is computed over all time steps.\par
+x: input layer; h: hidden layer; y: output layer.\par
+The computation graph is as follows:
+\begin{itemize}
+    \item many-to-many:\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture10/many_to_many.png}
+        \caption*{Many-to-Many RNN}
+        \label{fig:many_to_many_rnn}
+    \end{figure}
+    \item sequence to sequence: many-to-one + one-to-many:\par
+    Encoder + Decoder:\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture10/sequence_to_sequence.png}
+        \caption*{Sequence to Sequence}
+        \label{fig:sequence_to_sequence}
+    \end{figure}
+    \newpage
+\end{itemize}\par
+
+\textbf{Backpropagation through time (BPTT):}\par
+When the sequence is long, the gradients can vanish or explode, which makes it hard to train the model.\par
+Hence, Truncated Backpropagation through Time (TBPTT) is used to mitigate this issue by limiting the number of time steps for which gradients are backpropagated.\par
+The key idea is to only backpropagate through a truncated sequence of time steps, rather than the entire sequence.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/truncated_backpropagation.png}
+    \caption*{Truncated Backpropagation through Time (TBPTT)}
+    \label{fig:tbptt}
+\end{figure}
+
+Multilayer RNN is constructed by more than one hidden layer, where the output of one layer is fed as input to the next layer.\par
+
+
+\subsection{Image Captioning}
+First using CNN features from the image, then feeding them into an RNN to generate the caption.\par
+Add the third weight matrix to combine the CNN features with the RNN hidden states.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/image_weight.png}
+    \caption*{Image Captioning with CNN and RNN}
+    \label{fig:image_captioning}
+\end{figure}
+
+Attention mechanisms can be used to improve the performance of image captioning models by allowing the model to focus on specific parts of the image when generating each word of the caption.\par
+
+\subsection{Long Short-Term Memory (LSTM)}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/Vanilla_RNN_vs_LSTM.png}
+    \caption*{Long Short-Term Memory (LSTM)}
+    \label{fig:lstm}
+\end{figure}
+
+four gates:\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/ifog.png}
+    \caption*{LSTM Gates}
+    \label{fig:lstm_gates}
+\end{figure}
+
+A figure to show the LSTM architecture, here the weight matrix is a conjunction of that of each gate:\par
+To be ware that here element wise multiplication is used other than the usual matrix multiplication.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture10/LSTM.png}
+    \caption*{LSTM figure}
+    \label{fig:LSTM_figure}
+\end{figure}
+
+
+\textbf{Gradient Flow}\par
+The gradient flow of the vanilla RNN:\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture10/Vanilla_RNN_Gradient_FLow.png}
+    \caption*{Gradient Flow in Vanilla RNN}
+    \label{fig:gradient_flow}
+\end{figure}
+Where computing gradient of \(h_0\) involves many factors of W, which can lead to gradient explosion or vanishing.\par
+\newpage
+
+And in LSTM, The gradient of weight matrix W will be calculated each time step by c(current cell state) and h(current hidden state) which are saved well during forward and backward.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture10/LSTM_Gradient_FLow.png}
+    \caption*{Gradient Flow in LSTM}
+    \label{fig:lstm_gradient_flow}
+\end{figure}
+\newpage
+
+
+\section*{Lecture 11: Segmentation, Localization and Detection}
+\addcontentsline{toc}{section}{Lecture 11: Segmentation, Localization and Detection}
+\setcounter{section}{11}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Classification and Localization}
+On the base of the output of scores, now additionally another output is produced for the bounding box coordinates(x, y, w, h), namely multi-task loss.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture11/Classification_and_Localization.png}
+    \caption*{Classification and Localization}
+    \label{fig:classification_and_localization}
+\end{figure}
+
+\subsection{Object Detection}
+Different from regression since the number of objects is unknown and can vary from image to image.\par
+\begin{itemize}
+    \item Sliding Window\par
+    The problem is that how to choose the window size and stride.
+    \item Region Proposal\par
+    This approach generates many potential bounding boxes first(2000 for example) and then classifies them.
+    It is a fixed algorithom \textbf{Selective Search} but not a learnable one.\par
+    \begin{enumerate}
+        \item R-CNN(Regions with CNN features)
+        \begin{enumerate}
+            \item Region Proposal: Using \textbf{Selective Search} to generate region proposals.
+            \item Feature Extraction: Extracting CNN features from each proposed region.
+            \item Classification: Classifying each proposed region using a set of SVMs.
+            \item Bounding Box Regression: Refining the bounding box coordinates using a regression model.
+        \end{enumerate}
+        Problem: For 2000 region proposals, we need to perform 2000 forward passes through the network.\par
+        \item Fast R-CNN\par
+        Doing only one forward pass through the network.\par
+        \begin{enumerate}
+            \item Region Proposal: Using \textbf{Selective Search} to generate region proposals.
+            \item RoI Pooling: Applying RoI pooling to extract fixed-size feature maps for each proposed region.
+            \item Classification and Bounding Box Regression: Classifying each region and refining the bounding box coordinates using a single network.
+        \end{enumerate}
+        Problem: The Selective Search algorithm is a CPU bottleneck and slows down the overall detection pipeline.\par
+        \item Faster R-CNN\par
+        Make CNN do proposals. Insert \textbf{Region Proposal Network (RPN)} before RoI Pooling.\par
+        Jointly train with 4 losses:\par
+        \begin{enumerate}
+            \item RPN classify object/not object.
+            \item RPN regress box coordinates.
+            \item Final classification score.
+            \item Final box coordinates.
+        \end{enumerate}
+    \end{enumerate}
+    \item Detection without Proposals: YOLO(You Only Look Once) / SSD(Single Shot Detection)\par
+    Divides the image into a grids, generate a set of boxes centered at each grid cell.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture11/without_proposal.png}
+        \caption*{YOLO and SSD}
+        \label{fig:yolo_ssd}
+    \end{figure}
+\end{itemize}
+
+\subsection{Instance Segmentation}
+Like object detection, but predict a binary mask for each object, get pixel-wise segmentation.\par
+\begin{itemize}
+    \item Mask R-CNN\par
+    Add a layer after fast R-CNN to predict a binary mask for each RoI.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture11/Mask_R-CNN.png}
+        \caption*{Mask R-CNN}
+        \label{fig:mask_rcnn}
+    \end{figure}
+\end{itemize}
+\newpage
+
+\subsection{Semantic Segmentation}
+To classify each pixel in the image, assigning a class label(here different objects are seen as different classes) to every pixel.\par
+\begin{itemize}
+    \item Sliding Window: the complexity is high.
+    \item Fully Convolutional Networks (FCN)\par
+    Replace the fully connected layers with convolutional layers, allowing the network to output a spatial map instead of a single label.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture11/FCN.png}
+        \caption*{Fully Convolutional Networks}
+        \label{fig:fcn}
+    \end{figure}
+    However, keep the size of the input image cost a lot. Hence downsampling and upsampling is often used(first decrease spatial resolution(清晰度), then increase in the second half):\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture11/downsampling_and_upsampling.png}
+        \caption*{Downsampling and Upsampling}
+        \label{fig:downsampling_upsampling}
+    \end{figure}
+
+    \begin{itemize}
+        \item \textbf{How to implement upsampling: by unpooling}\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture11/unpooling.png}
+            \caption*{Unpooling}
+            \label{fig:unpooling}
+        \end{figure}
+        Remember which element was pooled in the downsampling(Pooling) step and reverse the operation during upsampling.\par
+        \newpage
+
+        \item \textbf{Learnable Upsampling: Transpose(转置) Convolution}\par
+        Seen the inputs as weights, to multiply with the filters and add together to get the output.\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture11/Transpose_Convolution.png}
+            \caption*{Transpose Convolution}
+            \label{fig:transpose_convolution}
+        \end{figure}
+    \end{itemize}
+\end{itemize}
+\newpage
+
+
+\section*{Lecture 12: Visualizing and Understanding}
+\addcontentsline{toc}{section}{Lecture 12: Visualizing and Understanding}
+\setcounter{section}{12}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Some Visualizations}
+\begin{enumerate}
+    \item First Layer: Visualize Filters\par
+    tend to show edges and textures.
+    \item The filters/kernels(raw weights) doesn't show interesting results
+    \item Last Layer: Nearest Neighbors\par
+    tend to be like the nearest neighbors in the training set.\par
+    t-SNE is often used for visualizing high-dimensional data in a lower-dimensional space.
+    \item Maximally Activating Patches:\par
+    Find the input patches that maximize the activation of a particular neuron to understand what features are being detected.\par
+    \item Occlusion(遮挡) Experiments:\par
+    Gradually occlude (遮挡) parts of the input image and observe the effect on the neuron's activation to identify important regions.
+    \item Sliency(显著性) Maps:\par
+    Compute the gradient of the output with respect to the input image to \textbf{identify important regions} .
+\end{enumerate}
+
+
+\subsection{Activating Neurons}
+\begin{itemize}
+    \item Visualizing CNN features: Gradient Ascent:
+    Generate a synthetic image that maximally activates a neuron
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture12/Gradient_Ascent.png}
+        \caption*{Gradient Ascent}
+        \label{fig:gradient_ascent}
+    \end{figure}
+    \begin{enumerate}
+        \item Initialize image to zeros\par
+        \textbf{Repeat:}
+        \item Forward image to compute current scores
+        \item Backprop to get gradient of neuron value with respect to image pixels
+        \item Make a small update to the image
+    \end{enumerate}
+
+    \item Fooling Images/Adversarial Examples
+    Generate an image that is classified as a target class by the network, but is unrecognizable to humans.
+    \begin{enumerate}
+        \item Start from an arbitrary image
+        \item Pick an arbitrary class
+        \item Modify the image to maximize the class
+        \item Repeat until network is fooled
+    \end{enumerate}
+
+    \item DeepDream: Amplify existing features\par
+    Choose an image and a layer in a CNN, repeat:\par
+    \begin{enumerate}
+        \item Forward: compute activations at chosen layer
+        \item Set gradient of chosen layer equal to its activation, which is equivalent to:\par
+        \(I^* = arg \max_I \Sigma_i f_i(I)^2\)
+        \item Backward: Compute gradient on image
+        \item Update image
+    \end{enumerate}
+
+    \item Feature Inversion\par
+    Given a CNN feature vector for an image, find a new image that matches the given feature vector and look natural.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture12/Feature_Inversion.png}
+        \caption*{Feature Inversion}
+        \label{fig:feature_inversion}
+    \end{figure}
+    Here a new regularization \textbf{Total Variation regularizer(全变差正则化)} is introduced to encourage spatial smoothness in the generated image.
+
+    \item Texture Synthesis\par
+    Given a texture image, generate a new image that has a similar texture. This can be done by optimizing an image to match the feature statistics of the texture image in a CNN.\par
+    \begin{itemize}
+        \item Traditional Methods: Nearest Neighbors
+        \item Neural Texture Synthesis: Gram Matrix\par
+        For a \(C x H x W\) feature map, reshape it to a \(C x (H*W)\) matrix \(F\), then compute the Gram matrix \(G = F * F^T\), which captures the correlations between different feature channels.\par
+        \begin{enumerate}
+            \item Pretrain a CNN on ImageNet
+            \item Run input texture forward, record activations on every layer
+            \item At each layer compute the Gram matrix
+            \item Initilize generated image from random noise\par
+            Repeat:
+            \item Pass generated image through the CNN, compute Gram matrix at each layer
+            \item Compute loss: weighted sum of L2 distances between Gram matrices of generated image and texture image
+            \item Backprop to get gradient on image
+            \item Make gradient step on image
+        \end{enumerate}
+    \end{itemize}
+
+    \item Neural Style Transfer\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture12/Neural_Style_Transfer.png}
+        \caption*{Neural Style Transfer}
+        \label{fig:neural_style_transfer}
+    \end{figure}
+    Multiple style images: Mix style from multiple images by taking a weighted averge of Gram matrices.\par
+
+    Problem: requires many forward / backward passes, very slow.\par
+    Possible Solution:
+    \begin{enumerate}
+        \item Train a feedforward network to approximate the style transfer process.
+        \item Use pretrained CNN to compute same losses as before.
+        \item After training, stylize images using a single forward pass.
+    \end{enumerate}
+\end{itemize}
+\newpage
+
+
+\section*{Lecture 13: Generative Models}
+\addcontentsline{toc}{section}{Lecture 13: Generative Models}
+\setcounter{section}{13}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\subsection{Unsupervised Learning}
+Goal: Learn some underlying hidden structure of the data.\par
+\subsection{Generative Models}
+Given training data, generate new samples from same distribution.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture13/Generative_Models.png}
+    \caption*{Generative Models}
+    \label{fig:generative_models}
+\end{figure}
+Several flavors:
+\begin{itemize}
+    \item Explicit density estimation: explicitly define and sovle for \(p_{model}(x)\)
+    \item Implicit density estimation: learn model that can sample from \(p_{model}(x)\) without explicitly defining it.
+\end{itemize}
+\begin{enumerate}
+    \item PixelRNN and PixelCNN\par
+    Fully visible belief network, explicit density model.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture13/PixelRNN_PixelCNN.png}
+        \caption*{PixelRNN and PixelCNN}
+        \label{fig:pixel_rnn_pixel_cnn}
+    \end{figure}
+
+    \begin{itemize}
+        \item {PixelRNN}\par
+        Generate image pixels starting from corner.\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.4\textwidth]{images/Lecture13/PixelRNN.png}
+            \caption*{PixelRNN}
+            \label{fig:pixel_rnn}
+        \end{figure}
+        It is slow since it is sequential.\par
+        \newpage
+
+        \item {PixelCNN}\par
+        Using CNN with masked convolutions(the filter multiplied with a mask) to learn the maximum likelihood of the pixel distribution.\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/PixelCNN.png}
+            \caption*{PixelCNN}
+            \label{fig:pixel_cnn}
+        \end{figure}
+
+        In the first layer, the mask is \(\begin{bmatrix}
+                                                1 & 1 & 1 \\
+                                                1 & 0 & 0 \\
+                                                0 & 0 & 0
+                                            \end{bmatrix}
+                                            \), and in subsequent layers: \(\begin{bmatrix}
+                                                1 & 1 & 1 \\
+                                                1 & 1 & 0 \\
+                                                0 & 0 & 0
+                                            \end{bmatrix}\)\par
+        By multiple layers, the receptive field increases, allowing the model to capture the context of the entire image.\par
+        \mbox{}\\
+        What the model learns is the Maximum Likelihood Estimation (MLE) of the pixel distribution. Here in the training process, the output of the model is a probability distribution for each pixel.\par
+        The training pixel data is used in input, also to compute the Cross Entropy loss: \(L = -\sum_{i} \log p_{\theta}(x_{i} | x_{<i})\)\par
+    
+        \mbox{}\\
+        PixelCNN can trains in parallel across different pixels, making it faster than PixelRNN. However, generation must still proceed sequentially and is still slow.\par
+    \end{itemize}
+    \item Variational Autoencoders(VAE：变分自编码器)\par
+    VAEs define intractable(难以计算，不可求解) density function with latent $z$(潜在变量):\par
+    \begin{equation*}
+        p_{\theta }(x) = \int p(z) p_{\theta }(x | z) \,dz
+    \end{equation*}
+
+    \begin{enumerate}
+        \item Some background: Autoencoders\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/Autoencoder.png}
+            \caption*{Autoencoder}
+            \label{fig:autoencoder}
+        \end{figure}
+    
+        After training, throw away the decoder.\par
+        The encoder can be used to initilize a supervised model:\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/encoder.png}
+            \caption*{Using Encoder for Supervised Learning}
+            \label{fig:encoder_supervised}
+        \end{figure}
+
+        \item Variational Autoencoders(VAE：变分自编码器)\par
+        Probabilistic spin(概率建模) on autoencoders: sample from the model to generate data.\par
+        The true parameters are $\theta$.\par
+        In VAEs, $z$ and the output $\hat{x}$ are both a distribution.
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.4\textwidth]{images/Lecture13/sample.png}
+            \caption*{Sampling from the VAE}
+            \label{fig:vae_sampling}
+        \end{figure}
+
+        To maximize the likelihood of the data which is intractable(derivation is diffcult), in addition to decoder network modeling $p_{\theta}(x | z)$, \textbf{define additional encoder network $q_{\phi}(z | x)$ to approximate $p(z | x)$}.\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/VAE.png}
+            \caption*{Variational Autoencoder}
+            \label{fig:vae}
+        \end{figure}
+        Now equipped with encoder and decoder networks, the maximum likelihood estimation can be performed using the reparameterization trick:\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=1.0\textwidth]{images/Lecture13/reparameterization.png}
+            \caption*{Reparameterization Trick}
+            \label{fig:vae_reparameterization}
+        \end{figure}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=1.0\textwidth]{images/Lecture13/lower_bound.png}
+            \caption*{Lower Bound}
+            \label{fig:vae_lower_bound}
+        \end{figure}
+        In which the first term we maximize is to reconstruct the input data, and the second term is to make approximate posterior distribution close to the prior.\par
+
+        \newpage
+        \textbf{In total:}\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/total.png}
+            \caption*{Total Procedure}
+            \label{fig:vae_total}
+        \end{figure}
+        After training, only the decoder is needed. When generating, we can sample from the prior $p(z)$ and pass it through the decoder to obtain new data points.\par
+    \end{enumerate}
+    
+    \item Generative Adversarial(对抗) Networks(GAN)\par
+    GANS don't work with explicit density function.\par
+    GANs consist of two neural networks, a generator that try to fool the discriminator by generating real-looking images, and discriminator network that try to distinguish betwween real and fake images.\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture13/Generator_Discriminator_Network.png}
+        \caption*{Generator and Discriminator Networks}
+        \label{fig:gan}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{images/Lecture13/minimax.png}
+        \caption*{Minimax Game}
+        \label{fig:gan_minimax}
+    \end{figure}
+    Alternate between:\par
+    \begin{enumerate}
+        \item \textbf{Gradient ascent} on discreminator\par
+        \begin{equation*}
+            \max_{\theta_d} \left[
+                \mathbb{E}_{x \sim p_{data}} \log D_{\theta_d}(x)
+                + \mathbb{E}_{z \sim p(z)} \log \left(1 - D_{\theta_d}(G_{\theta_g}(z))\right)
+            \right]
+        \end{equation*}
+
+        \item \textbf{Gradient descent} on generator\par
+        \begin{equation*}
+            \min_{\theta_g} \mathbb{E}_{z \sim p(z)} \log \left(1 - D_{\theta_d}(G_{\theta_g}(z))\right)
+        \end{equation*}
+        However, when optimizing this objective, we have higher gradient signal for good samples but low gradient signal for poor samples:\par
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/problem.png}
+            \caption*{Problem with Gradient Descent}
+            \label{fig:gan_problem}
+        \end{figure}
+
+        Hence, instead we do \textbf{Gradient ascent} on generator, to maximizing the likelihood of discriminator being wrong:\par
+        \begin{equation*}
+            \max_{\theta_g} \mathbb{E}_{z \sim p(z)} \log D_{\theta_d}(G_{\theta_g}(z))
+        \end{equation*}
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.6\textwidth]{images/Lecture13/different_objective.png}
+            \caption*{Different Objective for Generator}
+            \label{fig:gan_different_objective}
+        \end{figure}
+    \end{enumerate}
+
+    During every training iteration, we first update the discriminator and then the generator, alternatively.\par
+    After training, only the generator is needed to produce new samples.\par
+
+\end{enumerate}
+\newpage
+
+
+\section*{Lecture 14: Reinforcement Learning}
+\addcontentsline{toc}{section}{Lecture 14: Reinforcement Learning}
+\setcounter{section}{14}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+Problems involving an \textbf{agent} interacting with an \textbf{environment}, which provids numeric \textbf{reward} signals.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/Lecture14/episode.png}
+    \caption*{Reinforcement Learning Episode}
+    \label{fig:reinforcement_learning_episode}
+\end{figure}
+
+\subsection{Markov Decision Process (MDP)}
+\begin{enumerate}
+    \item MDP\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture14/MDP_def.png}
+        \caption*{Markov Decision Process Definition}
+        \label{fig:mdp_def}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture14/MDP.png}
+        \caption*{Markov Decision Process}
+        \label{fig:mdp}
+    \end{figure}
+
+    \item Some definitions:\par
+    \begin{itemize}
+        \item \textbf{value function:} the expected cumulative reward from following the policy from state s\par
+        \begin{equation*}
+            V^{\pi}(s) = \mathbb{E} \left[ \sum_{t\geq 0} \gamma^t r_t | s_0 = s, \pi \right]
+        \end{equation*}
+
+        \item \textbf{Q-value function:} the expected cumulative reward from taking action a in state s and then following th policy\par
+        \begin{equation*}
+            Q^{\pi}(s, a) = \mathbb{E} \left[ \sum_{t\geq 0} \gamma^t r_t | s_0 = s, a_0 = a, \pi \right]
+        \end{equation*}
+    \end{itemize}
+
+    \item Bellman Equation:\par
+    \begin{equation*}
+        Q^*(s, a) = \max_{\pi} \mathbb{E} \left[ \sum_{t\geq 0} \gamma^t r_t | s_0 = s, a_0 = a, \pi \right]
+                = \mathbb{E}_{s' \sim P(s' | s, a)} \left[ r + \gamma \max_{a'} Q^*(s', a') | s, a \right]
+    \end{equation*}
+    Use this equation as an iterative update. However, the Q-value is not scalable, difficult to compute.\par
+\end{enumerate}
+
+\subsection{Q-learning}
+\begin{enumerate}
+    \item Q-learning\par
+    Use a function appropximator to estimate the action-value function: \(Q(s, a; \theta) \approx Q^*(s, a)\)\par
+    And if the function approximator is a deep neural network -> \textbf{Deep Q-Network (DQN)}\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture14/Q-learning.png}
+        \caption*{Q-learning}
+        \label{fig:q_learning}
+    \end{figure}
+
+    \item Experience Replay\par
+    The current Q-network parameters determines next training samples which can lead to bad feedback loops.\par
+    Hence, continually update a \textbf{replay memory} table of transitions \((s_t, a_t, r_t, s_{t+1})\) as experience episodes.\par
+    Train Q-network on random minibatches of transitions from the replay memory, instead of consecutive samples, each transition can also contribute to multiple weight updates which brings greater data efficiency.\par
+
+    \item Policy Gradients\par
+    \begin{itemize}
+        \item Q-value is hard to compute when the action space is large or continuous.
+        \item Q-learning doesn't learn the policy directly, but rather the action-value function.
+    \end{itemize}
+    For each policy, define its value:\(J(\theta) = \mathbb{E} \left[ \sum_{t \geq 0} \gamma^t r_t | \pi_\theta \right]\). We want to find \(\theta^* = \arg \max_\theta J(\theta)\).\par
+\end{enumerate}
+
+\subsection{REINFORCE algorithm}
+\begin{enumerate}
+    \item REINFORCE algorithm\par
+    \begin{equation*}
+        J(\theta) = \mathbb{E}_{\tau \sim p(\tau ; \theta)} \left[ r(\tau) \right] = \int_\tau r(\tau) p(\tau ; \theta) \,d\tau
+    \end{equation*}
+    where \(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)\) is a trajectory.\par
+    Now differentiate: \(\nabla_\theta J(\theta) = \int_\tau r(\tau) \nabla_\theta p(\tau ; \theta) \,d\tau\) which is intractable.\par
+    A trick can be used: \(\nabla_\theta p(\tau ; \theta) = p(\tau ; \theta) \frac{\nabla_\theta p(\tau ; \theta)}{p(\tau ; \theta)} = p(\tau ; \theta) \nabla_\theta \log p(\tau ; \theta)\)\par
+    Then: 
+    \begin{equation*}
+        \nabla_\theta J(\theta) = \int_\tau r(\tau) p(\tau ; \theta) \nabla_\theta \log p(\tau ; \theta) \,d\tau = \mathbb{E}_{\tau \sim p(\tau ; \theta)} \left[ r(\tau) \nabla_\theta \log p(\tau ; \theta) \right]
+    \end{equation*}
+    now can estimate with Monte Carlo sampling.\par
+
+    As to the term \(\nabla_\theta \log p(\tau ; \theta)\), it is independent of the transition and can be estimated using the log-likelihood of the trajectory under the current policy:\par
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture14/trick.png}
+        \caption*{Trick}
+        \label{fig:trick}
+    \end{figure}
+
+    According to the value of \(r(\tau)\), change the probabilities of the actions seen.\par
+    However, a good trajectory leads to all its actions were good(the reward multiplied with all its action directly), this can lead to high variance in the gradient estimates, making training unstable.\par
+
+    \item Variance reduction\par
+    \begin{itemize}
+        \item First idea: Push up probabilities of an action seen, only by the cumulative future reward from that state:\par
+        \begin{equation*}
+            \nabla_\theta J(\theta) \approx \sum_{t \geq 0} \left( \sum_{t' \geq t} r_{t'} \right) \nabla_\theta \log \pi_\theta(a_t | s_t)
+        \end{equation*}
+
+        \item Second idea: Use discount factor $\gamma$ to ignore delayed effects:\par
+        \begin{equation*}
+            \nabla_\theta J(\theta) \approx \sum_{t \geq 0} \left( \sum_{t' \geq t} \gamma^{t' - t} r_{t'} \right) \nabla_\theta \log \pi_\theta(a_t | s_t)
+        \end{equation*}
+
+        \item Third idea: Baseline\par
+        The raw value of a trajectory isn't necessarily meaningful, but whether a reward is better or worse than \textbf{what you expect to get}.\par
+        Introduce a baseline function dependent on the state only:\par
+        \begin{equation*}
+            \nabla_\theta J(\theta) \approx \sum_{t \geq 0} \left( \sum_{t' \geq t} r_{t'} - b(s_t) \right) \nabla_\theta \log \pi_\theta(a_t | s_t)
+        \end{equation*}
+        How to choose a baseline:\par
+        \begin{itemize}
+            \item A simple baseline: constant moving average of rewards experiences so far from all trajectories.\par
+            \item A better baseline: use the value function \(V(s_t)\).
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Actor-Critic Algorithm}
+\begin{itemize}
+    \item Combine value function and policy gradient methods.
+    \item Use a critic to estimate the value function \(V(s_t)\) and an actor to update the policy. Hence there's no need to wait for the final reward of a trajectory.
+\end{itemize}
+
+\subsection{REINFORCE in action}
+\begin{enumerate}
+    \item Recurrent Attention Model(RAM):\par
+    Using REINFORCE to select the most relevant parts of an image for a given task(glimpse).\par
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{images/Lecture14/RAM.png}
+        \caption*{Recurrent Attention Model}
+        \label{fig:ram}
+    \end{figure}
+    \item AlphaGO
+\end{enumerate}
+\newpage
+
+
+\section*{Lecture 15: Efficient Inference and Training}
+\addcontentsline{toc}{section}{Lecture 15: Efficient Inference and Training}
+\setcounter{section}{15}
+\setcounter{subsection}{0}
+\setcounter{equation}{0}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Lecture15/agenda.png}
+    \caption*{Agenda}
+    \label{fig:agenda}
+\end{figure}
+
+\subsection{Part 1: Algorithms for Efficient Inference}
+\begin{enumerate}
+    \item Pruning: pruning neural network...\par
+    \item Weight Sharing: sharing weights between different layers or parts of the network to reduce the number of parameters\par
+    \item Quantization: quantizing the weight and activation\par
+    \item Low Rank Approximation: to reduce redundancy of high dimension data\par
+    \item Binary / Ternary Network: using binary or ternary weights and activations\par
+    \item Winograd Transformation: an algorithm for fast convolution
+\end{enumerate}
+
+\subsection{Part 2: Hardware for Efficient Inference}
+\subsection{Part 3: Algorithms for Efficient Training}
+\begin{enumerate}
+    \item Parallelization\par
+    \begin{itemize}
+        \item Data Parallelism: splitting the data across multiple GPUs
+        \item Model Parallelism: splitting the model across multiple GPUs
+    \end{itemize}
+    \item Mixed Preciseion with FP16 and FP32
+    \item Model Distillation(蒸馏): training a smaller model to mimic a larger model
+    \item DSD: Dense-Sparse-Dense Training: dense training + sparse pruning training + dense retraining
+\end{enumerate}
+
+\subsection{Part 4: Hardware for Effcient Training}
+
 \end{CJK}
 \end{document}
-
 
 
 
